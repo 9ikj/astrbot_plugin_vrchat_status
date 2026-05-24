@@ -8,7 +8,7 @@ from astrbot.api.star import Context, Star
 
 
 STATUS_HTML_TEMPLATE = '''
-<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 16px; min-width: 320px; max-width: 480px;">
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 16px; display: inline-block;">
   <div style="background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden;">
     <!-- 头部 -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 16px 20px; color: #fff;">
@@ -227,7 +227,8 @@ class VRChatStatusPlugin(Star):
         """发送状态消息，优先使用 HTML 渲染"""
         data = self._get_status_data()
         try:
-            url = await self.html_render(STATUS_HTML_TEMPLATE, data)
+            options = {"omit_background": True, "full_page": True}
+            url = await self.html_render(STATUS_HTML_TEMPLATE, data, options=options)
             if event:
                 yield event.image_result(url)
             else:
