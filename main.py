@@ -20,7 +20,8 @@ STATUS_HTML_TEMPLATE = '''
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    width: max-content;
+    height: max-content;
   }
 </style>
 </head>
@@ -256,7 +257,7 @@ class VRChatStatusPlugin(Star):
             options = {
                 "type": "png",
                 "omit_background": True,
-                "full_page": False,
+                "full_page": True,
                 "scale": "device",
                 "caret": "hide",
             }
