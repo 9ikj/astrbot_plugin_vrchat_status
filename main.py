@@ -14,19 +14,19 @@ STATUS_HTML_TEMPLATE = '''
 <meta charset="utf-8">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 600px; display: flex; justify-content: center; align-items: flex-start; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 600px; }
 </style>
 </head>
 <body>
 <div style="padding: 24px;">
-  <div style="background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; width: 100%;">
+  <div id="card" style="background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden;">
     <!-- 头部 -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 24px 28px; color: #fff;">
       <div style="font-size: 16px; opacity: 0.85; margin-bottom: 6px;">服务器状态监测</div>
       <div style="font-size: 28px; font-weight: 700;">🎮 VRChat</div>
     </div>
     <!-- 状态 -->
-    <div style="padding: 20px 24px; border-left: 5px solid {{ dot_color }}; margin: 20px 20px; background: #f8f9fa; border-radius: 0 10px 10px 0;">
+    <div style="padding: 20px 24px; border-left: 5px solid {{ dot_color }}; margin: 20px; background: #f8f9fa; border-radius: 0 10px 10px 0;">
       <div style="display: flex; align-items: center; gap: 12px;">
         <span style="width: 14px; height: 14px; border-radius: 50%; background: {{ dot_color }}; display: inline-block; flex-shrink: 0;"></span>
         <span style="font-size: 22px; font-weight: 700; color: #1a1a2e;">{{ status }}</span>
@@ -251,9 +251,10 @@ class VRChatStatusPlugin(Star):
             options = {
                 "type": "png",
                 "omit_background": True,
-                "full_page": True,
+                "full_page": False,
                 "scale": "device",
                 "caret": "hide",
+                "clip": {"x": 24, "y": 24, "width": 552, "height": 300},
             }
             url = await self.html_render(STATUS_HTML_TEMPLATE, data, options=options)
             if event:
