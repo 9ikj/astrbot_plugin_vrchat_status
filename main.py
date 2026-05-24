@@ -239,7 +239,13 @@ class VRChatStatusPlugin(Star):
         """发送状态消息，优先使用 HTML 渲染"""
         data = self._get_status_data()
         try:
-            options = {"omit_background": True, "full_page": True}
+            options = {
+                "type": "png",
+                "omit_background": True,
+                "full_page": True,
+                "scale": "css",
+                "caret": "hide",
+            }
             url = await self.html_render(STATUS_HTML_TEMPLATE, data, options=options)
             if event:
                 yield event.image_result(url)
