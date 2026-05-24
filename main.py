@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 import aiohttp
 from astrbot.api import AstrBotConfig, logger
@@ -214,11 +214,17 @@ class VRChatStatusPlugin(Star):
         if self.last_indicator == "minor":
             dot_color = "#ffc107"
 
+        # UTC 转换为 Asia/Shanghai (UTC+8)
+        local_time = ""
+        if self.last_update_time:
+            tz_shanghai = timezone(timedelta(hours=8))
+            local_time = self.last_update_time.astimezone(tz_shanghai).strftime("%Y-%m-%d %H:%M:%S")
+
         return {
             "status": self.last_status,
             "dot_color": dot_color,
             "summary": self.last_summary,
-            "update_time": self.last_update_time.strftime("%Y-%m-%d %H:%M:%S") if self.last_update_time else "",
+            "update_time": local_time,
         }
 
     def _format_status_message(self) -> str:
