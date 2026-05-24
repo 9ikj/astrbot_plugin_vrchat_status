@@ -30,3 +30,7 @@ AstrBot 插件 - 监测 VRChat 服务器状态并推送到即时通讯平台
 
 - [AstrBot](https://github.com/AstrBotDevs/AstrBot)
 - [AstrBot 插件开发文档](https://docs.astrbot.app/dev/star/plugin-new.html)
+
+## 许可证
+
+本项目基于 [GNU Affero General Public License v3.0](LICENSE) 开源。
