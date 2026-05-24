@@ -8,7 +8,18 @@ from astrbot.api.star import Context, Star
 
 
 STATUS_HTML_TEMPLATE = '''
-<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 16px; display: inline-block;">
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: fit-content; height: fit-content; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+</style>
+</head>
+<body>
+<div style="padding: 16px;">
   <div style="background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden;">
     <!-- 头部 -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 16px 20px; color: #fff;">
@@ -37,6 +48,8 @@ STATUS_HTML_TEMPLATE = '''
     {% endif %}
   </div>
 </div>
+</body>
+</html>
 '''
 
 
