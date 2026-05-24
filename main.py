@@ -48,8 +48,8 @@ class VRChatStatusPlugin(Star):
 
     async def initialize(self):
         """插件初始化"""
-        # 从配置加载注册的会话
-        self.registered_sessions = self.config.get("registered_sessions", [])
+        # 从 KV 存储加载注册的会话
+        self.registered_sessions = await self.get_kv_data("registered_sessions", [])
 
         # 启动轮询任务
         self.is_running = True
@@ -80,8 +80,7 @@ class VRChatStatusPlugin(Star):
         umo = event.unified_msg_origin
         if umo not in self.registered_sessions:
             self.registered_sessions.append(umo)
-            self.config["registered_sessions"] = self.registered_sessions
-            self.config.save_config()
+            await self.put_kv_data("registered_sessions", self.registered_sessions)
             yield event.plain_result("已订阅 VRChat 状态变化通知")
         else:
             yield event.plain_result("当前会话已订阅")
@@ -92,8 +91,7 @@ class VRChatStatusPlugin(Star):
         umo = event.unified_msg_origin
         if umo in self.registered_sessions:
             self.registered_sessions.remove(umo)
-            self.config["registered_sessions"] = self.registered_sessions
-            self.config.save_config()
+            await self.put_kv_data("registered_sessions", self.registered_sessions)
             yield event.plain_result("已取消订阅 VRChat 状态变化通知")
         else:
             yield event.plain_result("当前会话未订阅")
