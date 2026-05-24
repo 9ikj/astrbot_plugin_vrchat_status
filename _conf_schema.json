@@ -1,0 +1,8 @@
+{
+  "registered_sessions": {
+    "description": "已订阅的会话列表（自动管理，无需手动修改）",
+    "type": "list",
+    "default": [],
+    "invisible": true
+  }
+}
