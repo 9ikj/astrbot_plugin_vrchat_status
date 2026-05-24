@@ -241,7 +241,8 @@ class VRChatStatusPlugin(Star):
         try:
             options = {
                 "type": "png",
-                "full_page": True,
+                "omit_background": True,
+                "full_page": False,
                 "scale": "device",
                 "caret": "hide",
             }
