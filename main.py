@@ -20,8 +20,7 @@ STATUS_HTML_TEMPLATE = '''
     display: flex;
     justify-content: center;
     align-items: center;
-    width: max-content;
-    height: max-content;
+    min-height: 100vh;
   }
 </style>
 </head>
@@ -257,9 +256,10 @@ class VRChatStatusPlugin(Star):
             options = {
                 "type": "png",
                 "omit_background": True,
-                "full_page": True,
+                "full_page": False,
                 "scale": "device",
                 "caret": "hide",
+                "clip": {"x": 240, "y": 200, "width": 800, "height": 300},
             }
             url = await self.html_render(STATUS_HTML_TEMPLATE, data, options=options)
             if event:
