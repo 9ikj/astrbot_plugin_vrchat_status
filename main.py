@@ -47,6 +47,8 @@ STATUS_HTML_TEMPLATE = '''
     {% endif %}
   </div>
 </div>
+<!-- 隐藏时间戳确保每次渲染不同 -->
+<div style="font-size: 0; color: transparent; user-select: none;">{{ timestamp }}</div>
 </body>
 </html>
 '''
@@ -238,6 +240,7 @@ class VRChatStatusPlugin(Star):
     async def _send_status(self, event: AstrMessageEvent = None):
         """发送状态消息，优先使用 HTML 渲染"""
         data = self._get_status_data()
+        data["timestamp"] = datetime.now().strftime("%H%M%S%f")
         try:
             options = {
                 "type": "png",
