@@ -14,7 +14,7 @@ STATUS_HTML_TEMPLATE = '''
 <meta charset="utf-8">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 600px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 600px; height: auto; min-height: 0; }
 </style>
 </head>
 <body>
