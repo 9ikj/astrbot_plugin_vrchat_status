@@ -18,34 +18,32 @@ STATUS_HTML_TEMPLATE = '''
 </style>
 </head>
 <body>
-<div style="padding: 24px;">
-  <div id="card" style="background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden;">
-    <!-- 头部 -->
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 24px 28px; color: #fff;">
-      <div style="font-size: 16px; opacity: 0.85; margin-bottom: 6px;">服务器状态监测</div>
-      <div style="font-size: 28px; font-weight: 700;">🎮 VRChat</div>
-    </div>
-    <!-- 状态 -->
-    <div style="padding: 20px 24px; border-left: 5px solid {{ dot_color }}; margin: 20px; background: #f8f9fa; border-radius: 0 10px 10px 0;">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="width: 14px; height: 14px; border-radius: 50%; background: {{ dot_color }}; display: inline-block; flex-shrink: 0;"></span>
-        <span style="font-size: 22px; font-weight: 700; color: #1a1a2e;">{{ status }}</span>
-      </div>
-    </div>
-    <!-- 详情 -->
-    {% if summary %}
-    <div style="padding: 0 24px; margin-bottom: 16px;">
-      <div style="background: #fff3cd; color: #856404; padding: 14px 18px; border-radius: 10px; font-size: 17px;">
-        ⚠️ 受影响组件: {{ summary }}
-      </div>
-    </div>
-    {% endif %}
-    {% if update_time %}
-    <div style="padding: 0 24px 20px; color: #999; font-size: 16px;">
-      🕐 {{ update_time }}
-    </div>
-    {% endif %}
+<div style="background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden;">
+  <!-- 头部 -->
+  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 24px 28px; color: #fff;">
+    <div style="font-size: 16px; opacity: 0.85; margin-bottom: 6px;">服务器状态监测</div>
+    <div style="font-size: 28px; font-weight: 700;">🎮 VRChat</div>
   </div>
+  <!-- 状态 -->
+  <div style="padding: 20px 24px; border-left: 5px solid {{ dot_color }}; margin: 20px; background: #f8f9fa; border-radius: 0 10px 10px 0;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="width: 14px; height: 14px; border-radius: 50%; background: {{ dot_color }}; display: inline-block; flex-shrink: 0;"></span>
+      <span style="font-size: 22px; font-weight: 700; color: #1a1a2e;">{{ status }}</span>
+    </div>
+  </div>
+  <!-- 详情 -->
+  {% if summary %}
+  <div style="padding: 0 24px; margin-bottom: 16px;">
+    <div style="background: #fff3cd; color: #856404; padding: 14px 18px; border-radius: 10px; font-size: 17px;">
+      ⚠️ 受影响组件: {{ summary }}
+    </div>
+  </div>
+  {% endif %}
+  {% if update_time %}
+  <div style="padding: 0 24px 20px; color: #999; font-size: 16px;">
+    🕐 {{ update_time }}
+  </div>
+  {% endif %}
 </div>
 <!-- 隐藏时间戳确保每次渲染不同 -->
 <div style="font-size: 0; color: transparent; user-select: none;">{{ timestamp }}</div>
