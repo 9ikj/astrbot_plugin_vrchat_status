@@ -14,8 +14,8 @@ STATUS_HTML_TEMPLATE = '''
 <meta charset="utf-8">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: fit-content; height: fit-content; overflow: visible; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  html { width: max-content; height: max-content; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: max-content; height: max-content; background: transparent; }
 </style>
 </head>
 <body>
@@ -250,7 +250,7 @@ class VRChatStatusPlugin(Star):
             options = {
                 "type": "png",
                 "omit_background": True,
-                "full_page": False,
+                "full_page": True,
                 "scale": "device",
                 "caret": "hide",
             }
