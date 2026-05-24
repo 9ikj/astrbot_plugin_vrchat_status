@@ -8,22 +8,34 @@ from astrbot.api.star import Context, Star
 
 
 STATUS_HTML_TEMPLATE = '''
-<div style="font-size: 24px; padding: 20px; font-family: Arial, sans-serif;">
-  <h2 style="margin: 0 0 16px 0;">🎮 VRChat 服务器状态</h2>
-  <div style="padding: 12px; border-radius: 8px; background: {{ bg_color }}; color: white;">
-    <span style="font-size: 28px;">{{ emoji }}</span>
-    <span style="font-weight: bold;">{{ status }}</span>
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 16px; min-width: 320px; max-width: 480px;">
+  <div style="background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden;">
+    <!-- 头部 -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 16px 20px; color: #fff;">
+      <div style="font-size: 13px; opacity: 0.85; margin-bottom: 4px;">服务器状态监测</div>
+      <div style="font-size: 20px; font-weight: 600;">🎮 VRChat</div>
+    </div>
+    <!-- 状态 -->
+    <div style="padding: 16px 20px; border-left: 4px solid {{ dot_color }}; margin: 16px 16px; background: #f8f9fa; border-radius: 0 8px 8px 0;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="width: 10px; height: 10px; border-radius: 50%; background: {{ dot_color }}; display: inline-block; flex-shrink: 0;"></span>
+        <span style="font-size: 16px; font-weight: 600; color: #1a1a2e;">{{ status }}</span>
+      </div>
+    </div>
+    <!-- 详情 -->
+    {% if summary %}
+    <div style="padding: 0 20px; margin-bottom: 12px;">
+      <div style="background: #fff3cd; color: #856404; padding: 10px 14px; border-radius: 8px; font-size: 14px;">
+        ⚠️ 受影响组件: {{ summary }}
+      </div>
+    </div>
+    {% endif %}
+    {% if update_time %}
+    <div style="padding: 0 20px 16px; color: #999; font-size: 13px;">
+      🕐 {{ update_time }}
+    </div>
+    {% endif %}
   </div>
-  {% if summary %}
-  <div style="margin-top: 12px; padding: 10px; background: #fff3cd; border-radius: 8px;">
-    ⚠️ 受影响组件: {{ summary }}
-  </div>
-  {% endif %}
-  {% if update_time %}
-  <div style="margin-top: 12px; color: #666; font-size: 18px;">
-    🕐 更新时间: {{ update_time }}
-  </div>
-  {% endif %}
 </div>
 '''
 
@@ -178,20 +190,19 @@ class VRChatStatusPlugin(Star):
         """获取状态模板数据"""
         if not self.last_status:
             return {
-                "emoji": "🟢",
                 "status": "正常运行",
-                "bg_color": "#28a745",
+                "dot_color": "#28a745",
                 "summary": "",
                 "update_time": "",
             }
 
-        emoji = self.STATUS_EMOJI.get(self.last_indicator, "⚪")
-        bg_color = "#28a745" if self.last_indicator == "none" else "#dc3545"
+        dot_color = "#28a745" if self.last_indicator == "none" else "#dc3545"
+        if self.last_indicator == "minor":
+            dot_color = "#ffc107"
 
         return {
-            "emoji": emoji,
             "status": self.last_status,
-            "bg_color": bg_color,
+            "dot_color": dot_color,
             "summary": self.last_summary,
             "update_time": self.last_update_time.strftime("%Y-%m-%d %H:%M:%S") if self.last_update_time else "",
         }
