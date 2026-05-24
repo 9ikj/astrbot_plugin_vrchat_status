@@ -18,7 +18,7 @@ STATUS_HTML_TEMPLATE = '''
 </style>
 </head>
 <body>
-<div style="background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden;">
+<div id="content" style="background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden;">
   <!-- 头部 -->
   <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 24px 28px; color: #fff;">
     <div style="font-size: 16px; opacity: 0.85; margin-bottom: 6px;">服务器状态监测</div>
@@ -47,6 +47,13 @@ STATUS_HTML_TEMPLATE = '''
 </div>
 <!-- 隐藏时间戳确保每次渲染不同 -->
 <div style="font-size: 0; color: transparent; user-select: none;">{{ timestamp }}</div>
+<script>
+  // 动态计算内容高度并设置给 body
+  var content = document.getElementById('content');
+  if (content) {
+    document.body.style.height = content.scrollHeight + 'px';
+  }
+</script>
 </body>
 </html>
 '''
@@ -249,10 +256,9 @@ class VRChatStatusPlugin(Star):
             options = {
                 "type": "png",
                 "omit_background": True,
-                "full_page": False,
+                "full_page": True,
                 "scale": "device",
                 "caret": "hide",
-                "clip": {"x": 0, "y": 0, "width": 600, "height": 400},
             }
             url = await self.html_render(STATUS_HTML_TEMPLATE, data, options=options)
             if event:
