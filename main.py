@@ -241,9 +241,8 @@ class VRChatStatusPlugin(Star):
         try:
             options = {
                 "type": "png",
-                "omit_background": True,
                 "full_page": True,
-                "scale": "css",
+                "scale": "device",
                 "caret": "hide",
             }
             url = await self.html_render(STATUS_HTML_TEMPLATE, data, options=options)
