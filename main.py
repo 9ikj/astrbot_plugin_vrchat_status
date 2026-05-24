@@ -7,6 +7,27 @@ from astrbot.api.event import AstrMessageEvent, MessageChain, filter
 from astrbot.api.star import Context, Star
 
 
+STATUS_HTML_TEMPLATE = '''
+<div style="font-size: 24px; padding: 20px; font-family: Arial, sans-serif;">
+  <h2 style="margin: 0 0 16px 0;">🎮 VRChat 服务器状态</h2>
+  <div style="padding: 12px; border-radius: 8px; background: {{ bg_color }}; color: white;">
+    <span style="font-size: 28px;">{{ emoji }}</span>
+    <span style="font-weight: bold;">{{ status }}</span>
+  </div>
+  {% if summary %}
+  <div style="margin-top: 12px; padding: 10px; background: #fff3cd; border-radius: 8px;">
+    ⚠️ 受影响组件: {{ summary }}
+  </div>
+  {% endif %}
+  {% if update_time %}
+  <div style="margin-top: 12px; color: #666; font-size: 18px;">
+    🕐 更新时间: {{ update_time }}
+  </div>
+  {% endif %}
+</div>
+'''
+
+
 class VRChatStatusPlugin(Star):
     """VRChat 服务器状态监测插件"""
 
@@ -63,8 +84,9 @@ class VRChatStatusPlugin(Star):
     @filter.command("vrcstatus")
     async def check_status(self, event: AstrMessageEvent):
         """手动查询 VRChat 服务器状态"""
-        status_text = await self._fetch_and_format_status()
-        yield event.plain_result(status_text)
+        await self._fetch_status()
+        async for result in self._send_status(event):
+            yield result
 
     @filter.command("vrcsubscribe")
     async def subscribe(self, event: AstrMessageEvent):
@@ -112,8 +134,7 @@ class VRChatStatusPlugin(Star):
         # 状态发生变化时推送通知
         if self.last_status != old_status or self.last_indicator != old_indicator:
             if self.registered_sessions:
-                status_text = self._format_status_message()
-                await self._notify_subscribers(status_text)
+                await self._send_status()
 
     async def _fetch_status(self):
         """获取 VRChat 状态"""
@@ -153,13 +174,30 @@ class VRChatStatusPlugin(Star):
         except Exception as e:
             logger.error(f"获取 VRChat 状态失败: {e}")
 
-    async def _fetch_and_format_status(self) -> str:
-        """获取并格式化状态信息（用于手动查询）"""
-        await self._fetch_status()
-        return self._format_status_message()
+    def _get_status_data(self) -> dict:
+        """获取状态模板数据"""
+        if not self.last_status:
+            return {
+                "emoji": "🟢",
+                "status": "正常运行",
+                "bg_color": "#28a745",
+                "summary": "",
+                "update_time": "",
+            }
+
+        emoji = self.STATUS_EMOJI.get(self.last_indicator, "⚪")
+        bg_color = "#28a745" if self.last_indicator == "none" else "#dc3545"
+
+        return {
+            "emoji": emoji,
+            "status": self.last_status,
+            "bg_color": bg_color,
+            "summary": self.last_summary,
+            "update_time": self.last_update_time.strftime("%Y-%m-%d %H:%M:%S") if self.last_update_time else "",
+        }
 
     def _format_status_message(self) -> str:
-        """格式化状态消息"""
+        """格式化状态消息（纯文本）"""
         if not self.last_status:
             return "VRChat 服务器状态: 🟢 正常运行"
 
@@ -174,11 +212,29 @@ class VRChatStatusPlugin(Star):
 
         return msg
 
-    async def _notify_subscribers(self, message: str):
-        """通知所有订阅者"""
-        msg_chain = MessageChain().message(message)
-        for umo in self.registered_sessions:
-            try:
-                await self.context.send_message(umo, msg_chain)
-            except Exception as e:
-                logger.error(f"发送消息到 {umo} 失败: {e}")
+    async def _send_status(self, event: AstrMessageEvent = None):
+        """发送状态消息，优先使用 HTML 渲染"""
+        data = self._get_status_data()
+        try:
+            url = await self.html_render(STATUS_HTML_TEMPLATE, data)
+            if event:
+                yield event.image_result(url)
+            else:
+                msg_chain = MessageChain().image(url)
+                for umo in self.registered_sessions:
+                    try:
+                        await self.context.send_message(umo, msg_chain)
+                    except Exception as e:
+                        logger.error(f"发送消息到 {umo} 失败: {e}")
+        except Exception as e:
+            logger.warning(f"HTML 渲染失败，使用纯文本: {e}")
+            text = self._format_status_message()
+            if event:
+                yield event.plain_result(text)
+            else:
+                msg_chain = MessageChain().message(text)
+                for umo in self.registered_sessions:
+                    try:
+                        await self.context.send_message(umo, msg_chain)
+                    except Exception as e2:
+                        logger.error(f"发送消息到 {umo} 失败: {e2}")
