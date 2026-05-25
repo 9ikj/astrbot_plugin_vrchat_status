@@ -53,6 +53,7 @@ class VRChatStatusPlugin(Star):
 
         # 启动轮询任务
         self.is_running = True
+        self._first_poll = True
         self._poll_task = asyncio.get_event_loop().create_task(self._poll_loop())
         logger.info("VRChat Status 插件已启动")
 
@@ -135,6 +136,11 @@ class VRChatStatusPlugin(Star):
         old_indicator = self.last_indicator
 
         await self._fetch_status()
+
+        # 首次轮询仅记录状态，不推送
+        if self._first_poll:
+            self._first_poll = False
+            return
 
         # 状态发生变化时推送通知
         if self.last_status != old_status or self.last_indicator != old_indicator:
