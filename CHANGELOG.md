@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.5] - 2026-05-25
+
+### Fixed
+- 使用 `asyncio.create_task()` 替代已弃用的 `asyncio.get_event_loop()`
+- 添加 aiohttp 10 秒请求超时，防止轮询循环阻塞
+- 纯文本降级消息使用配置的时区偏移，与 HTML 卡片一致
+- 推送模式下无订阅者时跳过 HTML 渲染
+
 ## [1.0.4] - 2026-05-25
 
 ### Fixed
