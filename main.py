@@ -139,7 +139,8 @@ class VRChatStatusPlugin(Star):
         # 状态发生变化时推送通知
         if self.last_status != old_status or self.last_indicator != old_indicator:
             if self.registered_sessions:
-                await self._send_status()
+                async for _ in self._send_status():
+                    pass
 
     async def _fetch_status(self):
         """获取 VRChat 状态"""
