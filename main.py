@@ -201,11 +201,12 @@ class VRChatStatusPlugin(Star):
         if self.last_indicator == "minor":
             dot_color = "#ffc107"
 
-        # UTC 转换为 Asia/Shanghai (UTC+8)
+        # UTC 转换为本地时区
         local_time = ""
         if self.last_update_time:
-            tz_shanghai = timezone(timedelta(hours=8))
-            local_time = self.last_update_time.astimezone(tz_shanghai).strftime("%Y-%m-%d %H:%M:%S")
+            offset = self.config.get("timezone_offset", 8)
+            tz_local = timezone(timedelta(hours=offset))
+            local_time = self.last_update_time.astimezone(tz_local).strftime("%Y-%m-%d %H:%M:%S")
 
         return {
             "status": self.last_status,

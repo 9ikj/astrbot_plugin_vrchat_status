@@ -1,1 +1,8 @@
-{}
+{
+  "timezone_offset": {
+    "description": "时区偏移（UTC 偏移小时数，如 8 表示 UTC+8）",
+    "type": "int",
+    "default": 8,
+    "hint": "用于将 VRChat 状态更新时间转换为本地时间，默认 UTC+8（中国标准时间）"
+  }
+}
