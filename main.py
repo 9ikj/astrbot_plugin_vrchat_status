@@ -247,7 +247,7 @@ class VRChatStatusPlugin(Star):
             if event:
                 yield event.image_result(url)
             else:
-                msg_chain = MessageChain().image(url)
+                msg_chain = MessageChain().file_image(url)
                 for umo in self.registered_sessions:
                     try:
                         await self.context.send_message(umo, msg_chain)
