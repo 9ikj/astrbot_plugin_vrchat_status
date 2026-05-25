@@ -48,11 +48,13 @@ class VRChatStatusPlugin(Star):
         self.last_update_time = None
         self.is_running = False
 
-        # 注册的会话列表（用于主动推送）
-        self.registered_sessions: list[str] = []
+        # 从文件存储加载注册的会话
+        self.registered_sessions: list[str] = self._load_sessions()
 
-        # 轮询任务
-        self._poll_task = None
+        # 启动轮询任务
+        self.is_running = True
+        self._poll_task = asyncio.get_event_loop().create_task(self._poll_loop())
+        logger.info("VRChat Status 插件已启动")
 
     def _load_sessions(self) -> list[str]:
         """从文件加载注册的会话"""
@@ -74,16 +76,6 @@ class VRChatStatusPlugin(Star):
             )
         except Exception as e:
             logger.error(f"保存会话文件失败: {e}")
-
-    async def initialize(self):
-        """插件初始化"""
-        # 从文件存储加载注册的会话
-        self.registered_sessions = self._load_sessions()
-
-        # 启动轮询任务
-        self.is_running = True
-        self._poll_task = asyncio.create_task(self._poll_loop())
-        logger.info("VRChat Status 插件已启动")
 
     async def terminate(self):
         """插件卸载/停用时调用"""
