@@ -54,7 +54,7 @@ class VRChatStatusPlugin(Star):
         # 启动轮询任务
         self.is_running = True
         self._first_poll = True
-        self._poll_task = asyncio.get_event_loop().create_task(self._poll_loop())
+        self._poll_task = asyncio.create_task(self._poll_loop())
         logger.info("VRChat Status 插件已启动")
 
     def _load_sessions(self) -> list[str]:
@@ -153,7 +153,8 @@ class VRChatStatusPlugin(Star):
         headers = {"User-Agent": "AstrBot-VRChatStatusPlugin"}
 
         try:
-            async with aiohttp.ClientSession() as session:
+            timeout = aiohttp.ClientTimeout(total=10)
+            async with aiohttp.ClientSession(timeout=timeout) as session:
                 # 获取状态
                 async with session.get(self.STATUS_API, headers=headers) as resp:
                     if resp.status != 200:
@@ -226,12 +227,17 @@ class VRChatStatusPlugin(Star):
             msg += f"\n受影响组件: {self.last_summary}"
 
         if self.last_update_time:
-            msg += f"\n更新时间: {self.last_update_time.strftime('%Y-%m-%d %H:%M:%S')}"
+            offset = self.config.get("timezone_offset", 8)
+            tz_local = timezone(timedelta(hours=offset))
+            local_time = self.last_update_time.astimezone(tz_local).strftime("%Y-%m-%d %H:%M:%S")
+            msg += f"\n更新时间: {local_time}"
 
         return msg
 
     async def _send_status(self, event: AstrMessageEvent = None):
         """发送状态消息，优先使用 HTML 渲染"""
+        if not event and not self.registered_sessions:
+            return
         data = self._get_status_data()
         data["timestamp"] = datetime.now().strftime("%H%M%S%f")
         try:
