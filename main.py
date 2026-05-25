@@ -1,5 +1,5 @@
 import asyncio
-import os
+import json
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -7,11 +7,19 @@ import aiohttp
 from astrbot.api import AstrBotConfig, logger
 from astrbot.api.event import AstrMessageEvent, MessageChain, filter
 from astrbot.api.star import Context, Star
+from astrbot.core.utils.astrbot_path import get_astrbot_data_path
 
 
 def _load_template(name: str) -> str:
     template_path = Path(__file__).parent / "templates" / name
     return template_path.read_text(encoding="utf-8")
+
+
+def _get_data_dir(plugin_name: str) -> Path:
+    """获取插件数据目录"""
+    data_dir = Path(get_astrbot_data_path()) / "plugin_data" / plugin_name
+    data_dir.mkdir(parents=True, exist_ok=True)
+    return data_dir
 
 
 class VRChatStatusPlugin(Star):
@@ -46,10 +54,31 @@ class VRChatStatusPlugin(Star):
         # 轮询任务
         self._poll_task = None
 
+    def _load_sessions(self) -> list[str]:
+        """从文件加载注册的会话"""
+        sessions_file = _get_data_dir(self.name) / "sessions.json"
+        if sessions_file.exists():
+            try:
+                return json.loads(sessions_file.read_text(encoding="utf-8"))
+            except Exception as e:
+                logger.error(f"加载会话文件失败: {e}")
+        return []
+
+    def _save_sessions(self):
+        """保存注册的会话到文件"""
+        sessions_file = _get_data_dir(self.name) / "sessions.json"
+        try:
+            sessions_file.write_text(
+                json.dumps(self.registered_sessions, ensure_ascii=False),
+                encoding="utf-8",
+            )
+        except Exception as e:
+            logger.error(f"保存会话文件失败: {e}")
+
     async def initialize(self):
         """插件初始化"""
-        # 从 KV 存储加载注册的会话
-        self.registered_sessions = await self.get_kv_data("registered_sessions", [])
+        # 从文件存储加载注册的会话
+        self.registered_sessions = self._load_sessions()
 
         # 启动轮询任务
         self.is_running = True
@@ -80,7 +109,7 @@ class VRChatStatusPlugin(Star):
         umo = event.unified_msg_origin
         if umo not in self.registered_sessions:
             self.registered_sessions.append(umo)
-            await self.put_kv_data("registered_sessions", self.registered_sessions)
+            self._save_sessions()
             yield event.plain_result("已订阅 VRChat 状态变化通知")
         else:
             yield event.plain_result("当前会话已订阅")
@@ -91,7 +120,7 @@ class VRChatStatusPlugin(Star):
         umo = event.unified_msg_origin
         if umo in self.registered_sessions:
             self.registered_sessions.remove(umo)
-            await self.put_kv_data("registered_sessions", self.registered_sessions)
+            self._save_sessions()
             yield event.plain_result("已取消订阅 VRChat 状态变化通知")
         else:
             yield event.plain_result("当前会话未订阅")
