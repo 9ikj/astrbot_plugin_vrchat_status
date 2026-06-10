@@ -140,13 +140,24 @@ class VRChatStatusPlugin(Star):
         # 首次轮询仅记录状态，不推送
         if self._first_poll:
             self._first_poll = False
+            logger.info(f"首次轮询完成，当前状态: {self.last_status}, 指示器: {self.last_indicator}")
             return
 
         # 状态发生变化时推送通知
-        if self.last_status != old_status or self.last_indicator != old_indicator:
+        status_changed = self.last_status != old_status
+        indicator_changed = self.last_indicator != old_indicator
+
+        logger.info(f"状态检查: old_status={old_status}, new_status={self.last_status}, "
+                   f"old_indicator={old_indicator}, new_indicator={self.last_indicator}, "
+                   f"changed={status_changed or indicator_changed}")
+
+        if status_changed or indicator_changed:
             if self.registered_sessions:
+                logger.info(f"状态变化，推送到 {len(self.registered_sessions)} 个会话")
                 async for _ in self._send_status():
                     pass
+            else:
+                logger.info("状态变化但无订阅者")
 
     async def _fetch_status(self):
         """获取 VRChat 状态"""
@@ -163,8 +174,8 @@ class VRChatStatusPlugin(Star):
                     data = await resp.json()
 
                 status = data.get("status", {})
-                self.last_status = status.get("description", "")
-                self.last_indicator = status.get("indicator", "")
+                self.last_status = status.get("description") or ""
+                self.last_indicator = status.get("indicator") or ""
                 self.last_update_time = datetime.fromisoformat(
                     data["page"]["updated_at"].replace("Z", "+00:00")
                 )
@@ -237,6 +248,7 @@ class VRChatStatusPlugin(Star):
     async def _send_status(self, event: AstrMessageEvent = None):
         """发送状态消息，优先使用 HTML 渲染"""
         if not event and not self.registered_sessions:
+            logger.info("无订阅者，跳过推送")
             return
         data = self._get_status_data()
         data["timestamp"] = datetime.now().strftime("%H%M%S%f")
@@ -250,12 +262,14 @@ class VRChatStatusPlugin(Star):
                 "caret": "hide",
             }
             url = await self.html_render(html_template, data, options=options)
+            logger.info(f"HTML 渲染成功: {url}")
             if event:
                 yield event.image_result(url)
             else:
                 msg_chain = MessageChain().file_image(url)
                 for umo in self.registered_sessions:
                     try:
+                        logger.info(f"推送图片到 {umo}")
                         await self.context.send_message(umo, msg_chain)
                     except Exception as e:
                         logger.error(f"发送消息到 {umo} 失败: {e}")
@@ -268,6 +282,7 @@ class VRChatStatusPlugin(Star):
                 msg_chain = MessageChain().message(text)
                 for umo in self.registered_sessions:
                     try:
+                        logger.info(f"推送文本到 {umo}")
                         await self.context.send_message(umo, msg_chain)
                     except Exception as e2:
                         logger.error(f"发送消息到 {umo} 失败: {e2}")
