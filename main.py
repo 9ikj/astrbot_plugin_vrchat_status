@@ -266,7 +266,10 @@ class VRChatStatusPlugin(Star):
             if event:
                 yield event.image_result(url)
             else:
-                msg_chain = MessageChain().file_image(url)
+                if url.startswith(("http://", "https://")):
+                    msg_chain = MessageChain().url_image(url)
+                else:
+                    msg_chain = MessageChain().file_image(url)
                 for umo in self.registered_sessions:
                     try:
                         logger.info(f"推送图片到 {umo}")
