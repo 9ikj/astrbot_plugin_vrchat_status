@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Nunito:wght@300;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: #e6e9f0;
+    z-index: -1;
+  }
+
+  .card {
+    width: 480px;
+    transform: scale(2);
+    transform-origin: center center;
+    background: #e6e9f0;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+      12px 12px 24px rgba(163, 177, 198, 0.6),
+      -12px -12px 24px rgba(255, 255, 255, 0.8);
+  }
+
+  .header {
+    padding: 28px 28px 20px;
+  }
+
+  .header-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #9baacf;
+    margin-bottom: 6px;
+  }
+
+  .header-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: #5a6b8c;
+    letter-spacing: -0.5px;
+  }
+
+  .content {
+    padding: 24px 28px 28px;
+  }
+
+  .status-card {
+    padding: 20px;
+    background: #e6e9f0;
+    border-radius: 16px;
+    box-shadow:
+      inset 6px 6px 12px rgba(163, 177, 198, 0.4),
+      inset -6px -6px 12px rgba(255, 255, 255, 0.6);
+  }
+
+  .status-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .status-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e6e9f0;
+    box-shadow:
+      4px 4px 8px rgba(163, 177, 198, 0.5),
+      -4px -4px 8px rgba(255, 255, 255, 0.7);
+    flex-shrink: 0;
+    font-size: 20px;
+    color: {{ dot_color }};
+  }
+
+  .status-info {
+    flex: 1;
+  }
+
+  .status-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: #5a6b8c;
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #e6e9f0;
+    color: #7890b8;
+    box-shadow:
+      3px 3px 6px rgba(163, 177, 198, 0.4),
+      -3px -3px 6px rgba(255, 255, 255, 0.6);
+  }
+
+  {% if summary %}
+  .warning-box {
+    margin-top: 16px;
+    padding: 14px;
+    background: #e6e9f0;
+    border-radius: 12px;
+    box-shadow:
+      inset 4px 4px 8px rgba(163, 177, 198, 0.3),
+      inset -4px -4px 8px rgba(255, 255, 255, 0.5);
+  }
+
+  .warning-text {
+    font-size: 13px;
+    color: #7890b8;
+    line-height: 1.5;
+  }
+
+  .warning-label {
+    font-weight: 600;
+    color: #5a6b8c;
+  }
+  {% endif %}
+
+  {% if update_time %}
+  .footer {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .footer-time {
+    font-size: 11px;
+    color: #9baacf;
+    letter-spacing: 0.5px;
+  }
+  {% endif %}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="header-label">Status Monitor</div>
+    <div class="header-title">VRChat</div>
+  </div>
+
+  <div class="content">
+    <div class="status-card">
+      <div class="status-main">
+        <div class="status-icon">
+          {% if dot_color == '#28a745' %}✓
+          {% elif dot_color == '#ffc107' %}⚠
+          {% else %}✕{% endif %}
+        </div>
+        <div class="status-info">
+          <div class="status-text">{{ status }}</div>
+          <div class="status-badge">
+            {% if dot_color == '#28a745' %}Operational
+            {% elif dot_color == '#ffc107' %}Degraded
+            {% else %}Outage{% endif %}
+          </div>
+        </div>
+      </div>
+
+      {% if summary %}
+      <div class="warning-box">
+        <div class="warning-text">
+          <span class="warning-label">Affected:</span> {{ summary }}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if update_time %}
+    <div class="footer">
+      <div class="footer-time">{{ update_time }}</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+</body>
+</html>

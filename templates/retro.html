@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'VT323', monospace;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .card {
+    width: 480px;
+    transform: scale(2);
+    transform-origin: center center;
+    background: #1a1a2e;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 4px solid #16213e;
+    box-shadow:
+      0 0 0 2px #0f3460,
+      0 8px 0 #0f3460,
+      0 8px 24px rgba(0, 0, 0, 0.5);
+    image-rendering: pixelated;
+  }
+
+  .header {
+    padding: 16px;
+    background: #0f3460;
+    border-bottom: 4px solid #16213e;
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: repeating-linear-gradient(
+      90deg,
+      #e94560 0px,
+      #e94560 4px,
+      transparent 4px,
+      transparent 8px
+    );
+  }
+
+  .header-label {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: #00d9ff;
+    margin-bottom: 8px;
+    text-shadow: 2px 2px 0 #0f3460;
+  }
+
+  .header-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+    color: #e94560;
+    letter-spacing: 1px;
+    text-shadow: 3px 3px 0 #0f3460;
+  }
+
+  .content {
+    padding: 20px 16px 16px;
+  }
+
+  .status-box {
+    padding: 16px;
+    background: #16213e;
+    border: 3px solid #0f3460;
+    position: relative;
+  }
+
+  .status-box::before,
+  .status-box::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #0f3460;
+  }
+
+  .status-box::before {
+    top: -3px;
+    left: -3px;
+  }
+
+  .status-box::after {
+    bottom: -3px;
+    right: -3px;
+  }
+
+  .status-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 2px dashed #0f3460;
+  }
+
+  .status-icon {
+    width: 40px;
+    height: 40px;
+    background: #1a1a2e;
+    border: 3px solid {{ dot_color }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+    flex-shrink: 0;
+    {% if dot_color == '#28a745' %}
+    color: #00ff00;
+    {% elif dot_color == '#ffc107' %}
+    color: #ffff00;
+    {% else %}
+    color: #ff0000;
+    {% endif %}
+  }
+
+  .status-info {
+    flex: 1;
+  }
+
+  .status-label {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 7px;
+    color: #00d9ff;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+
+  .status-text {
+    font-size: 18px;
+    color: #ffffff;
+    line-height: 1.2;
+  }
+
+  .status-badge {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 10px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 8px;
+    letter-spacing: 1px;
+    {% if dot_color == '#28a745' %}
+    background: #00ff00;
+    color: #1a1a2e;
+    {% elif dot_color == '#ffc107' %}
+    background: #ffff00;
+    color: #1a1a2e;
+    {% else %}
+    background: #ff0000;
+    color: #ffffff;
+    {% endif %}
+    border: 2px solid #0f3460;
+    box-shadow: 3px 3px 0 #0f3460;
+  }
+
+  {% if summary %}
+  .warning-box {
+    margin-top: 12px;
+    padding: 12px;
+    background: #2d1b00;
+    border: 3px solid #ff9500;
+  }
+
+  .warning-text {
+    font-size: 16px;
+    color: #ffaa00;
+    line-height: 1.4;
+  }
+
+  .warning-label {
+    color: #ff9500;
+    font-weight: bold;
+  }
+  {% endif %}
+
+  {% if update_time %}
+  .footer {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 2px dashed #0f3460;
+  }
+
+  .footer-time {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 7px;
+    color: #00d9ff;
+    letter-spacing: 1px;
+  }
+  {% endif %}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="header-label">STATUS-MONITOR</div>
+    <div class="header-title">VRCHAT</div>
+  </div>
+
+  <div class="content">
+    <div class="status-box">
+      <div class="status-header">
+        <div class="status-icon">
+          {% if dot_color == '#28a745' %}✓
+          {% elif dot_color == '#ffc107' %}!
+          {% else %}X{% endif %}
+        </div>
+        <div class="status-info">
+          <div class="status-label">SYSTEM</div>
+          <div class="status-text">{{ status }}</div>
+        </div>
+      </div>
+
+      <div class="status-badge">
+        {% if dot_color == '#28a745' %}ONLINE
+        {% elif dot_color == '#ffc107' %}WARNING
+        {% else %}OFFLINE{% endif %}
+      </div>
+
+      {% if summary %}
+      <div class="warning-box">
+        <div class="warning-text">
+          <span class="warning-label">[!]</span> {{ summary }}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if update_time %}
+      <div class="footer">
+        <div class="footer-time">{{ update_time }}</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+</body>
+</html>

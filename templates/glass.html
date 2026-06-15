@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  /* 彩色背景 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: -1;
+  }
+
+  .card {
+    width: 480px;
+    transform: scale(2);
+    transform-origin: center center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  .header {
+    padding: 28px 28px 20px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+  }
+
+  .header-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 6px;
+  }
+
+  .header-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+  }
+
+  .content {
+    padding: 24px 28px 28px;
+  }
+
+  .status-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .status-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+    font-size: 20px;
+  }
+
+  .status-info {
+    flex: 1;
+  }
+
+  .status-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  {% if summary %}
+  .warning-box {
+    margin-top: 16px;
+    padding: 14px;
+    background: rgba(255, 193, 7, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+  }
+
+  .warning-text {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.5;
+  }
+
+  .warning-label {
+    font-weight: 600;
+    color: #ffffff;
+  }
+  {% endif %}
+
+  {% if update_time %}
+  .footer {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    text-align: center;
+  }
+
+  .footer-time {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.5px;
+  }
+  {% endif %}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="header-label">Status Monitor</div>
+    <div class="header-title">VRChat</div>
+  </div>
+
+  <div class="content">
+    <div class="status-main">
+      <div class="status-icon">
+        {% if dot_color == '#28a745' %}✓
+        {% elif dot_color == '#ffc107' %}⚠
+        {% else %}✕{% endif %}
+      </div>
+      <div class="status-info">
+        <div class="status-text">{{ status }}</div>
+        <div class="status-badge">
+          {% if dot_color == '#28a745' %}Operational
+          {% elif dot_color == '#ffc107' %}Degraded
+          {% else %}Outage{% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% if summary %}
+    <div class="warning-box">
+      <div class="warning-text">
+        <span class="warning-label">Affected:</span> {{ summary }}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if update_time %}
+    <div class="footer">
+      <div class="footer-time">{{ update_time }}</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+</body>
+</html>

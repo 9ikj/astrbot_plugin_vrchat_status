@@ -15,6 +15,12 @@ def _load_template(name: str) -> str:
     return template_path.read_text(encoding="utf-8")
 
 
+def _load_themes_config() -> dict:
+    """加载主题配置"""
+    themes_path = Path(__file__).parent / "themes.json"
+    return json.loads(themes_path.read_text(encoding="utf-8"))
+
+
 def _get_data_dir(plugin_name: str) -> Path:
     """获取插件数据目录"""
     data_dir = Path(get_astrbot_data_path()) / "plugin_data" / plugin_name
@@ -51,6 +57,12 @@ class VRChatStatusPlugin(Star):
         # 从文件存储加载注册的会话
         self.registered_sessions: list[str] = self._load_sessions()
 
+        # 加载主题配置
+        self.themes_config = _load_themes_config()
+
+        # 加载会话主题设置
+        self.session_themes: dict[str, str] = self._load_session_themes()
+
         # 启动轮询任务
         self.is_running = True
         self._first_poll = True
@@ -77,6 +89,38 @@ class VRChatStatusPlugin(Star):
             )
         except Exception as e:
             logger.error(f"保存会话文件失败: {e}")
+
+    def _load_session_themes(self) -> dict[str, str]:
+        """从文件加载会话主题设置"""
+        themes_file = _get_data_dir(self.name) / "session_themes.json"
+        if themes_file.exists():
+            try:
+                return json.loads(themes_file.read_text(encoding="utf-8"))
+            except Exception as e:
+                logger.error(f"加载会话主题文件失败: {e}")
+        return {}
+
+    def _save_session_themes(self):
+        """保存会话主题设置到文件"""
+        themes_file = _get_data_dir(self.name) / "session_themes.json"
+        try:
+            themes_file.write_text(
+                json.dumps(self.session_themes, ensure_ascii=False),
+                encoding="utf-8",
+            )
+        except Exception as e:
+            logger.error(f"保存会话主题文件失败: {e}")
+
+    def _get_theme_for_session(self, session_id: str) -> str:
+        """获取会话使用的主题"""
+        return self.session_themes.get(session_id, self.config.get("default_theme", "cyberpunk"))
+
+    def _get_theme_file(self, theme_id: str) -> str:
+        """根据主题 ID 获取模板文件名"""
+        for theme in self.themes_config.get("themes", []):
+            if theme["id"] == theme_id:
+                return theme["file"]
+        return "cyberpunk.html"  # 默认主题
 
     async def terminate(self):
         """插件卸载/停用时调用"""
@@ -117,6 +161,46 @@ class VRChatStatusPlugin(Star):
             yield event.plain_result("已取消订阅 VRChat 状态变化通知")
         else:
             yield event.plain_result("当前会话未订阅")
+
+    @filter.command("vrctheme")
+    async def set_theme(self, event: AstrMessageEvent):
+        """设置或查看当前会话的主题"""
+        args = event.message_str.split(maxsplit=1)
+        umo = event.unified_msg_origin
+
+        # 无参数：显示当前主题和可用主题列表
+        if len(args) == 1:
+            current_theme = self._get_theme_for_session(umo)
+            theme_name = next(
+                (t["name"] for t in self.themes_config["themes"] if t["id"] == current_theme),
+                current_theme
+            )
+
+            available_themes = "\n".join(
+                f"{i+1}. {t['name']} ({t['id']})"
+                for i, t in enumerate(self.themes_config["themes"])
+            )
+
+            result = f"当前主题: {theme_name}\n\n可用主题:\n{available_themes}\n\n使用 /vrctheme <主题ID> 切换主题"
+            yield event.plain_result(result)
+            return
+
+        # 有参数：设置主题
+        theme_id = args[1].strip().lower()
+
+        # 验证主题是否存在
+        valid_themes = [t["id"] for t in self.themes_config["themes"]]
+        if theme_id not in valid_themes:
+            yield event.plain_result(f"无效的主题 ID: {theme_id}\n使用 /vrctheme 查看可用主题")
+            return
+
+        # 保存主题设置
+        self.session_themes[umo] = theme_id
+        self._save_session_themes()
+
+        theme_name = next(t["name"] for t in self.themes_config["themes"] if t["id"] == theme_id)
+        yield event.plain_result(f"已将主题切换为: {theme_name}")
+        logger.info(f"会话 {umo} 切换主题为: {theme_id}")
 
     async def _poll_loop(self):
         """轮询循环"""
@@ -256,30 +340,55 @@ class VRChatStatusPlugin(Star):
             return
         data = self._get_status_data()
         data["timestamp"] = datetime.now().strftime("%H%M%S%f")
+
+        # 确定使用的主题
+        if event:
+            # 手动查询：使用当前会话的主题
+            theme_id = self._get_theme_for_session(event.unified_msg_origin)
+            theme_file = self._get_theme_file(theme_id)
+        else:
+            # 推送通知：使用默认主题（稍后逐个会话覆盖）
+            theme_id = self.config.get("default_theme", "cyberpunk")
+            theme_file = self._get_theme_file(theme_id)
+
         try:
-            html_template = _load_template("status.html")
-            options = {
-                "type": "png",
-                "omit_background": True,
-                "full_page": False,
-                "scale": "css",
-                "caret": "hide",
-            }
-            url = await self.html_render(html_template, data, options=options)
-            logger.info(f"HTML 渲染成功: {url}")
             if event:
+                # 手动查询：单个会话
+                html_template = _load_template(theme_file)
+                options = {
+                    "type": "png",
+                    "omit_background": True,
+                    "full_page": False,
+                    "scale": "css",
+                    "caret": "hide",
+                }
+                url = await self.html_render(html_template, data, options=options)
+                logger.info(f"HTML 渲染成功: {url}")
                 yield event.image_result(url)
             else:
-                if url.startswith(("http://", "https://")):
-                    msg_chain = MessageChain().url_image(url)
-                else:
-                    msg_chain = MessageChain().file_image(url)
+                # 推送通知：逐个会话使用各自主题
                 for umo in self.registered_sessions:
                     try:
-                        logger.info(f"推送图片到 {umo}")
+                        session_theme_id = self._get_theme_for_session(umo)
+                        session_theme_file = self._get_theme_file(session_theme_id)
+                        html_template = _load_template(session_theme_file)
+                        options = {
+                            "type": "png",
+                            "omit_background": True,
+                            "full_page": False,
+                            "scale": "css",
+                            "caret": "hide",
+                        }
+                        url = await self.html_render(html_template, data, options=options)
+                        logger.info(f"推送到 {umo}，使用主题: {session_theme_id}，渲染成功: {url}")
+
+                        if url.startswith(("http://", "https://")):
+                            msg_chain = MessageChain().url_image(url)
+                        else:
+                            msg_chain = MessageChain().file_image(url)
                         await self.context.send_message(umo, msg_chain)
                     except Exception as e:
-                        logger.error(f"发送消息到 {umo} 失败: {e}")
+                        logger.error(f"推送到 {umo} 失败: {e}")
         except Exception as e:
             logger.warning(f"HTML 渲染失败，使用纯文本: {e}")
             text = self._format_status_message()
