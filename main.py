@@ -126,8 +126,12 @@ class VRChatStatusPlugin(Star):
             except Exception as e:
                 logger.error(f"VRChat 状态检查失败: {e}")
 
-            # 根据状态决定轮询间隔
-            interval = 120 if self.last_indicator else 900  # 异常 2 分钟，正常 15 分钟
+            # 根据状态决定轮询间隔（从配置读取）
+            interval_abnormal = self.config.get("poll_interval_abnormal", 120)
+            interval_normal = self.config.get("poll_interval_normal", 900)
+            interval = interval_abnormal if self.last_indicator else interval_normal
+
+            logger.info(f"下次轮询间隔: {interval}秒 ({'异常' if self.last_indicator else '正常'}模式)")
             await asyncio.sleep(interval)
 
     async def _check_status_change(self):
