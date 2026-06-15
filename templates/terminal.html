@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .card {
+    width: 480px;
+    transform: scale(2);
+    transform-origin: center center;
+    background: #0d1117;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #30363d;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+    font-size: 13px;
+  }
+
+  .header {
+    padding: 16px;
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header-prompt {
+    color: #58a6ff;
+    font-family: 'Fira Code', monospace;
+    font-weight: 500;
+  }
+
+  .header-title {
+    color: #7ee787;
+    font-family: 'Fira Code', monospace;
+    font-weight: 700;
+  }
+
+  .content {
+    padding: 16px;
+    color: #c9d1d9;
+  }
+
+  .line {
+    margin-bottom: 8px;
+    line-height: 1.6;
+  }
+
+  .prompt {
+    color: #58a6ff;
+    margin-right: 4px;
+  }
+
+  .key {
+    color: #79c0ff;
+  }
+
+  .separator {
+    color: #6e7681;
+    margin: 0 4px;
+  }
+
+  .value {
+    color: #c9d1d9;
+  }
+
+  .status-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0;
+    padding: 12px;
+    background: #161b22;
+    border-left: 3px solid {{ dot_color }};
+    border-radius: 4px;
+  }
+
+  .status-indicator {
+    font-family: 'Fira Code', monospace;
+    font-weight: 700;
+    {% if dot_color == '#28a745' %}
+    color: #7ee787;
+    {% elif dot_color == '#ffc107' %}
+    color: #f0883e;
+    {% else %}
+    color: #ff7b72;
+    {% endif %}
+  }
+
+  .status-text {
+    color: #c9d1d9;
+    flex: 1;
+  }
+
+  .status-badge {
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    {% if dot_color == '#28a745' %}
+    background: #1a3d28;
+    color: #7ee787;
+    border: 1px solid #2ea043;
+    {% elif dot_color == '#ffc107' %}
+    background: #3d2e1a;
+    color: #f0883e;
+    border: 1px solid #d29922;
+    {% else %}
+    background: #3d1a1a;
+    color: #ff7b72;
+    border: 1px solid #da3633;
+    {% endif %}
+  }
+
+  {% if summary %}
+  .warning-line {
+    padding: 10px;
+    background: #2d2001;
+    border-left: 3px solid #d29922;
+    border-radius: 4px;
+    margin: 12px 0;
+  }
+
+  .warning-text {
+    color: #f0883e;
+    line-height: 1.6;
+  }
+
+  .warning-label {
+    color: #d29922;
+    font-weight: 600;
+  }
+  {% endif %}
+
+  {% if update_time %}
+  .footer {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #21262d;
+  }
+
+  .footer-line {
+    color: #6e7681;
+  }
+
+  .footer-time {
+    color: #58a6ff;
+  }
+  {% endif %}
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 14px;
+    background: #7ee787;
+    margin-left: 2px;
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <span class="header-prompt">root@monitor:~$</span>
+    <span class="header-title">vrchat-status</span>
+  </div>
+
+  <div class="content">
+    <div class="line">
+      <span class="prompt">></span>
+      <span class="key">service</span>
+      <span class="separator">:</span>
+      <span class="value">VRChat</span>
+    </div>
+
+    <div class="status-line">
+      <span class="status-indicator">
+        {% if dot_color == '#28a745' %}[OK]
+        {% elif dot_color == '#ffc107' %}[WARN]
+        {% else %}[ERROR]{% endif %}
+      </span>
+      <span class="status-text">{{ status }}</span>
+      <span class="status-badge">
+        {% if dot_color == '#28a745' %}OPERATIONAL
+        {% elif dot_color == '#ffc107' %}DEGRADED
+        {% else %}OUTAGE{% endif %}
+      </span>
+    </div>
+
+    {% if summary %}
+    <div class="warning-line">
+      <div class="warning-text">
+        <span class="warning-label">[!] affected:</span> {{ summary }}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if update_time %}
+    <div class="footer">
+      <div class="footer-line">
+        <span class="key">last_check</span>
+        <span class="separator">:</span>
+        <span class="footer-time">{{ update_time }}</span>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="line">
+      <span class="prompt">></span>
+      <span class="cursor"></span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

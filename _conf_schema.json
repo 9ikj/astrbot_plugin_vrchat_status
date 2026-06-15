@@ -1,4 +1,22 @@
 {
+  "default_theme": {
+    "type": "string",
+    "description": "默认主题",
+    "hint": "当会话未单独设置主题时使用的默认主题",
+    "default": "cyberpunk",
+    "options": [
+      "cyberpunk",
+      "neon",
+      "minimalist",
+      "glass",
+      "dark",
+      "neumorphism",
+      "terminal",
+      "gradient",
+      "retro",
+      "material"
+    ]
+  },
   "poll_interval_normal": {
     "type": "int",
     "description": "状态正常时轮询间隔（秒）",

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;600;800&family=Montserrat:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .card {
+    width: 480px;
+    transform: scale(2);
+    transform-origin: center center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 20px 60px rgba(118, 75, 162, 0.4),
+      0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  }
+
+  /* 动态网格背景 */
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.5;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    padding: 32px;
+  }
+
+  .header {
+    margin-bottom: 24px;
+  }
+
+  .header-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+  }
+
+  .header-title {
+    font-family: 'Raleway', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  /* 状态卡片 */
+  .status-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  .status-main {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .status-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.25);
+    flex-shrink: 0;
+    font-size: 24px;
+  }
+
+  .status-info {
+    flex: 1;
+  }
+
+  .status-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+  }
+
+  {% if summary %}
+  .warning-section {
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    border-left: 4px solid #ffd700;
+  }
+
+  .warning-text {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.5;
+  }
+
+  .warning-label {
+    font-weight: 700;
+    color: #ffffff;
+  }
+  {% endif %}
+
+  {% if update_time %}
+  .footer {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    text-align: center;
+  }
+
+  .footer-time {
+    font-size: 11px;
+    font-family: 'Raleway', sans-serif;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 1px;
+  }
+  {% endif %}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="content">
+    <div class="header">
+      <div class="header-label">Status Monitor</div>
+      <div class="header-title">VRChat</div>
+    </div>
+
+    <div class="status-card">
+      <div class="status-main">
+        <div class="status-icon">
+          {% if dot_color == '#28a745' %}✓
+          {% elif dot_color == '#ffc107' %}⚠
+          {% else %}✕{% endif %}
+        </div>
+        <div class="status-info">
+          <div class="status-text">{{ status }}</div>
+          <div class="status-badge">
+            {% if dot_color == '#28a745' %}Operational
+            {% elif dot_color == '#ffc107' %}Degraded
+            {% else %}Outage{% endif %}
+          </div>
+        </div>
+      </div>
+
+      {% if summary %}
+      <div class="warning-section">
+        <div class="warning-text">
+          <span class="warning-label">Affected:</span> {{ summary }}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if update_time %}
+    <div class="footer">
+      <div class="footer-time">{{ update_time }}</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+</body>
+</html>

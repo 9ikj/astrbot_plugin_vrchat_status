@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Rubik:wght@400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Rubik', sans-serif;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .card {
+    width: 480px;
+    transform: scale(2);
+    transform-origin: center center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+    background-size: 300% 300%;
+    animation: gradientFlow 8s ease infinite;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow:
+      0 20px 60px rgba(102, 126, 234, 0.4),
+      0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+  }
+
+  @keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .content {
+    position: relative;
+    padding: 32px;
+    z-index: 1;
+  }
+
+  .header {
+    margin-bottom: 24px;
+  }
+
+  .header-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 8px;
+  }
+
+  .header-title {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .status-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  .status-main {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+
+  .status-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    flex-shrink: 0;
+    font-size: 26px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .status-info {
+    flex: 1;
+  }
+
+  .status-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 6px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 24px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(255, 255, 255, 0.35);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  {% if summary %}
+  .warning-section {
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-left: 4px solid rgba(255, 215, 0, 0.8);
+  }
+
+  .warning-text {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.6;
+  }
+
+  .warning-label {
+    font-weight: 700;
+    color: #ffffff;
+  }
+  {% endif %}
+
+  {% if update_time %}
+  .footer {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+  }
+
+  .footer-time {
+    font-size: 11px;
+    font-family: 'Quicksand', sans-serif;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 1px;
+  }
+  {% endif %}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="content">
+    <div class="header">
+      <div class="header-label">Status Monitor</div>
+      <div class="header-title">VRChat</div>
+    </div>
+
+    <div class="status-card">
+      <div class="status-main">
+        <div class="status-icon">
+          {% if dot_color == '#28a745' %}✓
+          {% elif dot_color == '#ffc107' %}⚠
+          {% else %}✕{% endif %}
+        </div>
+        <div class="status-info">
+          <div class="status-text">{{ status }}</div>
+          <div class="status-badge">
+            {% if dot_color == '#28a745' %}Operational
+            {% elif dot_color == '#ffc107' %}Degraded
+            {% else %}Outage{% endif %}
+          </div>
+        </div>
+      </div>
+
+      {% if summary %}
+      <div class="warning-section">
+        <div class="warning-text">
+          <span class="warning-label">Affected:</span> {{ summary }}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if update_time %}
+    <div class="footer">
+      <div class="footer-time">{{ update_time }}</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+{
+  "themes": [
+    {
+      "id": "cyberpunk",
+      "name": "赛博朋克",
+      "file": "cyberpunk.html"
+    },
+    {
+      "id": "neon",
+      "name": "霓虹之夜",
+      "file": "neon.html"
+    },
+    {
+      "id": "minimalist",
+      "name": "极简主义",
+      "file": "minimalist.html"
+    },
+    {
+      "id": "glass",
+      "name": "玻璃拟态",
+      "file": "glass.html"
+    },
+    {
+      "id": "dark",
+      "name": "深色模式",
+      "file": "dark.html"
+    },
+    {
+      "id": "neumorphism",
+      "name": "新拟态",
+      "file": "neumorphism.html"
+    },
+    {
+      "id": "terminal",
+      "name": "终端风格",
+      "file": "terminal.html"
+    },
+    {
+      "id": "gradient",
+      "name": "渐变卡片",
+      "file": "gradient.html"
+    },
+    {
+      "id": "retro",
+      "name": "复古游戏",
+      "file": "retro.html"
+    },
+    {
+      "id": "material",
+      "name": "材料设计",
+      "file": "material.html"
+    }
+  ]
+}
