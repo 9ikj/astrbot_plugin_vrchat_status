@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.0.8] - 2026-06-15
+
+### Added
+- 实现多主题系统，支持 10 种精美主题
+  - cyberpunk（赛博朋克）- 青色霓虹科技感
+  - neon（霓虹之夜）- 紫粉渐变复古风
+  - minimalist（极简主义）- 纯白简约日系
+  - glass（玻璃拟态）- 毛玻璃 iOS 风格
+  - dark（深色模式）- 深灰商务 Discord 风格
+  - neumorphism（新拟态）- 浮雕柔和阴影
+  - terminal（终端风格）- 命令行黑客风
+  - gradient（渐变卡片）- 流动渐变 Instagram 风格
+  - retro（复古游戏）- 像素 8-bit 游戏风
+  - material（材料设计）- Google Material 风格
+- 新增 `/vrctheme` 指令支持查看和切换主题
+- 每个会话可独立设置主题，未设置则使用默认主题
+- 后台新增 `default_theme` 配置项，可选择全局默认主题
+
+### Changed
+- 手动查询和自动推送均使用对应会话的主题渲染
+- 主题配置持久化存储，重启后保留
+- 使用 fonts.loli.net 替代 fonts.googleapis.com 以提升国内访问速度
+
 ## [1.0.7] - 2026-06-15
 
 ### Added
