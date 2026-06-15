@@ -1,8 +1,35 @@
 {
-  "timezone_offset": {
-    "description": "时区偏移（UTC 偏移小时数，如 8 表示 UTC+8）",
+  "poll_interval_normal": {
     "type": "int",
+    "description": "状态正常时轮询间隔（秒）",
+    "hint": "当 VRChat 服务器状态正常时，每隔多少秒检查一次状态",
+    "default": 900,
+    "slider": {
+      "min": 60,
+      "max": 3600,
+      "step": 60
+    }
+  },
+  "poll_interval_abnormal": {
+    "type": "int",
+    "description": "状态异常时轮询间隔（秒）",
+    "hint": "当 VRChat 服务器状态异常时，每隔多少秒检查一次状态",
+    "default": 120,
+    "slider": {
+      "min": 30,
+      "max": 600,
+      "step": 30
+    }
+  },
+  "timezone_offset": {
+    "type": "int",
+    "description": "时区偏移（UTC 偏移小时数，如 8 表示 UTC+8）",
+    "hint": "用于将 VRChat 状态更新时间转换为本地时间，默认 UTC+8（中国标准时间）",
     "default": 8,
-    "hint": "用于将 VRChat 状态更新时间转换为本地时间，默认 UTC+8（中国标准时间）"
+    "slider": {
+      "min": -12,
+      "max": 14,
+      "step": 1
+    }
   }
 }
