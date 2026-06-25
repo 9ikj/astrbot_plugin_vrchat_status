@@ -2,7 +2,7 @@ name: astrbot_plugin_vrchat_status
 display_name: VRChat Status Monitor
 desc: 监测 VRChat 服务器状态并推送到 QQ
 short_desc: VRChat 服务器状态监测
-version: 1.0.8
+version: 1.0.9
 author: Jiuai
 repo: https://github.com/9ikj/astrbot_plugin_vrchat_status
 astrbot_version: ">=4.20.0"
