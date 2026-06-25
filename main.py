@@ -43,6 +43,11 @@ class VRChatStatusPlugin(Star):
         "critical": "🔴",
     }
 
+    @staticmethod
+    def _is_abnormal_indicator(indicator: str) -> bool:
+        """Statuspage uses "none" to mean no incident."""
+        return bool(indicator) and indicator != "none"
+
     def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
         self.config = config
@@ -213,9 +218,10 @@ class VRChatStatusPlugin(Star):
             # 根据状态决定轮询间隔（从配置读取）
             interval_abnormal = self.config.get("poll_interval_abnormal", 120)
             interval_normal = self.config.get("poll_interval_normal", 900)
-            interval = interval_abnormal if self.last_indicator else interval_normal
+            is_abnormal = self._is_abnormal_indicator(self.last_indicator)
+            interval = interval_abnormal if is_abnormal else interval_normal
 
-            logger.info(f"下次轮询间隔: {interval}秒 ({'异常' if self.last_indicator else '正常'}模式)")
+            logger.info(f"下次轮询间隔: {interval}秒 ({'异常' if is_abnormal else '正常'}模式)")
             await asyncio.sleep(interval)
 
     async def _check_status_change(self):
@@ -269,7 +275,7 @@ class VRChatStatusPlugin(Star):
                 )
 
                 # 如果有异常，获取详细信息
-                if self.last_indicator:
+                if self._is_abnormal_indicator(self.last_indicator):
                     async with session.get(self.SUMMARY_API, headers=headers) as resp:
                         if resp.status == 200:
                             summary_data = await resp.json()
@@ -296,7 +302,7 @@ class VRChatStatusPlugin(Star):
                 "update_time": "",
             }
 
-        dot_color = "#28a745" if self.last_indicator == "none" else "#dc3545"
+        dot_color = "#28a745" if not self._is_abnormal_indicator(self.last_indicator) else "#dc3545"
         if self.last_indicator == "minor":
             dot_color = "#ffc107"
 
