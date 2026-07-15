@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0] - 2026-07-15
+
+### Added
+- 状态卡片新增近 24 小时平台指标区块，4 张 sparkline 迷你图直接嵌入 `/vrcstatus` 渲染结果
+  - 在线人数（Concurrent Users）
+  - API 延迟（API Latency）
+  - API 请求数（API Requests）
+  - API 错误率（API Error Rate）
+- 数据源：VRChat Statuspage CloudFront CDN（每分钟一个数据点，1441 点覆盖 24 小时）
+- SVG 折线 + 面积渐变绘制，下采样到 180 点降低体积
+- 每张图显示当前值和 24 小时均值；请求速率与错误率强制以 0 为基线
+- 指标接口并发拉取（`asyncio.gather`），全部失败或部分失败时卡片自然折叠对应区块
+- 指标区块为每个主题定制配色（cyberpunk / dark / glass 系 / terminal / retro / minimalist / material / neumorphism），与卡片整体风格一致
+
 ## [1.0.9] - 2026-06-25
 
 ### Fixed

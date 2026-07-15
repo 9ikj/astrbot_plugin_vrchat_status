@@ -207,6 +207,8 @@
       {% endif %}
     </div>
 
+    {{ metrics_html | safe }}
+
     {% if update_time %}
     <div class="footer">
       <div class="footer-time">Updated {{ update_time }}</div>
