@@ -9,14 +9,15 @@
 
   body {
     font-family: 'Rubik', sans-serif;
-    background: transparent;
-    display: inline-block;
+    display: flex;
+    justify-content: center;
     padding: 40px;
   }
 
   .card {
     width: 480px;
     zoom: 2;
+    flex-shrink: 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
     background-size: 300% 300%;
     animation: gradientFlow 8s ease infinite;
