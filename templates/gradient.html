@@ -10,16 +10,12 @@
   body {
     font-family: 'Rubik', sans-serif;
     background: transparent;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    display: inline-block;
   }
 
   .card {
     width: 480px;
-    transform: scale(2);
-    transform-origin: center center;
+    zoom: 2;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
     background-size: 300% 300%;
     animation: gradientFlow 8s ease infinite;
