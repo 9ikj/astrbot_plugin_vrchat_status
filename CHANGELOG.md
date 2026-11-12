@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.2] - 2026-11-12
+
+### Fixed
+- 修复状态卡在文转图默认 800px 视口下左右被裁切、页面渲染不完整的问题
+  - 渲染前注入 `<meta name="viewport" content="width=1040, initial-scale=1">`，为 2x 卡片（960px）和左右留白提供足够视口
+  - 对不解析 viewport meta 的旧版/第三方文转图服务，窄视口下自动将卡片缩放为 1.75x / 1.5x，确保完整入镜
+  - 兼容 AstrBot 官方 t2i 服务及自建 astrbot-t2i-service 的默认 800x720 视口
+
 ## [1.1.1] - 2026-07-16
 
 ### Fixed
