@@ -10,9 +10,56 @@ from astrbot.api.star import Context, Star
 from astrbot.core.utils.astrbot_path import get_astrbot_data_path
 
 
+# AstrBot 文转图服务默认视口为 800x720，但会从 viewport meta 解析宽度。
+# 卡片按 2x 渲染后宽 960px，加上 body 左右各 40px 留白，总宽度需要 1040px。
+RENDER_VIEWPORT_WIDTH = 1040
+
+# 旧版/第三方文转图服务可能不解析 viewport meta。
+# 这类服务通常使用 800px 或 880px 视口，窄视口下按比例缩小卡片，保证完整入镜。
+_RENDER_VIEWPORT_FALLBACK = """
+<style data-vrc-viewport-fallback>
+  @media (max-width: 1039px) {
+    body { padding: 20px !important; }
+    .card { zoom: 1.5 !important; }
+  }
+  @media (min-width: 880px) and (max-width: 1039px) {
+    .card { zoom: 1.75 !important; }
+  }
+</style>
+"""
+
+
+def _prepare_template_for_render(html: str) -> str:
+    """让文转图视口容纳完整的 2x 状态卡，并兼容不识别 viewport 的渲染服务"""
+    if 'name="viewport"' not in html:
+        viewport_meta = (
+            f'<meta name="viewport" content="width={RENDER_VIEWPORT_WIDTH}, '
+            'initial-scale=1">'
+        )
+        if '<meta charset="utf-8">' in html:
+            html = html.replace(
+                '<meta charset="utf-8">',
+                '<meta charset="utf-8">\n' + viewport_meta,
+                1,
+            )
+        elif "<head>" in html:
+            html = html.replace("<head>", "<head>\n" + viewport_meta, 1)
+        else:
+            html = viewport_meta + "\n" + html
+
+    if "data-vrc-viewport-fallback" not in html:
+        if "</head>" in html:
+            html = html.replace(
+                "</head>", _RENDER_VIEWPORT_FALLBACK + "</head>", 1
+            )
+        else:
+            html += _RENDER_VIEWPORT_FALLBACK
+    return html
+
+
 def _load_template(name: str) -> str:
     template_path = Path(__file__).parent / "templates" / name
-    return template_path.read_text(encoding="utf-8")
+    return _prepare_template_for_render(template_path.read_text(encoding="utf-8"))
 
 
 def _load_themes_config() -> dict:
